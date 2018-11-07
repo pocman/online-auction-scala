@@ -1,0 +1,38 @@
+version: '2.1'
+services:
+  itemimpl-singleton:
+    image: itemimpl:1.0.0-SNAPSHOT
+    entrypoint: ["/opt/docker/bin/itemimpl"]
+    ports:
+      - 10730:9000
+    environment:
+      - KAFKA_BROKERS=kafka:9092
+      - AKKA_CLUSTER_ROLE_0=singleton
+      - LAGOM_CLUSTER_JOIN_SELF=on
+      - APPLICATION_SECRET=QCY?tAnfk?aZ?iwrNwnxIlR6CTf:G3gf:90Latabg@5241AB`R5W:1uDFN];Ik@n
+      - CASSANDRA_ADDRESS=http://cassandra:9042
+    depends_on:
+      - cassandra
+      - kafka
+  itemimpl-service-0:
+    image: itemimpl:1.0.0-SNAPSHOT
+    entrypoint: ["/opt/docker/bin/itemimpl"]
+    ports:
+      - 10731:9000
+    environment:
+      - KAFKA_BROKERS=kafka:9092
+      - LAGOM_CLUSTER_JOIN_SELF=on
+      - APPLICATION_SECRET=QCY?tAnfk?aZ?iwrNwnxIlR6CTf:G3gf:90Latabg@5241AB`R5W:1uDFN];Ik@n
+      - CASSANDRA_ADDRESS=http://cassandra:9042
+    depends_on:
+      - cassandra
+      - kafka
+  cassandra:
+    image: cassandra
+  kafka:
+    hostname: kafka
+    image: spotify/kafka:latest
+    environment:
+    - ADVERTISED_PORT=9092
+    - ADVERTISED_HOST=kafka
+    - KAFKA_ADVERTISED_HOST_NAME=kafka
