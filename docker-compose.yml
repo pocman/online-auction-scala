@@ -7,10 +7,10 @@ services:
       - 10730:9000
     environment:
       - KAFKA_BROKERS=kafka:9092
-      - AKKA_CLUSTER_ROLE_0=singleton
-      - LAGOM_CLUSTER_JOIN_SELF=on
-      - APPLICATION_SECRET=QCY?tAnfk?aZ?iwrNwnxIlR6CTf:G3gf:90Latabg@5241AB`R5W:1uDFN];Ik@n
       - CASSANDRA_ADDRESS=http://cassandra:9042
+      - APPLICATION_SECRET=QCY?tAnfk?aZ?iwrNwnxIlR6CTf:G3gf:90Latabg@5241AB`R5W:1uDFN];Ik@n
+      - AKKA_CLUSTER_ROLE=singleton
+      - LAGOM_CLUSTER_JOIN_SELF=on
     depends_on:
       - cassandra
       - kafka
@@ -21,9 +21,10 @@ services:
       - 10731:9000
     environment:
       - KAFKA_BROKERS=kafka:9092
-      - LAGOM_CLUSTER_JOIN_SELF=on
-      - APPLICATION_SECRET=QCY?tAnfk?aZ?iwrNwnxIlR6CTf:G3gf:90Latabg@5241AB`R5W:1uDFN];Ik@n
       - CASSANDRA_ADDRESS=http://cassandra:9042
+      - APPLICATION_SECRET=QCY?tAnfk?aZ?iwrNwnxIlR6CTf:G3gf:90Latabg@5241AB`R5W:1uDFN];Ik@n
+      - AKKA_CLUSTER_ROLE=service
+      - LAGOM_CLUSTER_JOIN_SELF=on
     depends_on:
       - cassandra
       - kafka
