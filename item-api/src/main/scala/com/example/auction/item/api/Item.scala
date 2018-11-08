@@ -61,3 +61,8 @@ object ItemSummary {
   implicit val format: Format[ItemSummary] = Json.format
 }
 
+case class Price(value: Int, currencyId: String)
+
+object Price {
+  implicit val format: Format[Price] = Json.format
+}

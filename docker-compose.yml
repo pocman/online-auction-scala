@@ -25,6 +25,7 @@ services:
       - APPLICATION_SECRET=QCY?tAnfk?aZ?iwrNwnxIlR6CTf:G3gf:90Latabg@5241AB`R5W:1uDFN];Ik@n
       - AKKA_CLUSTER_ROLE=service
       - LAGOM_CLUSTER_JOIN_SELF=on
+      - LAGOM_PERSISTENCE_PASSIVATE_AFTER_IDLE_TIMEOUT=30s
     depends_on:
       - cassandra
       - kafka

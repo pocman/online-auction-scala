@@ -46,6 +46,10 @@ class ItemEntity extends PersistentEntity {
         } else {
           ctx.thenPersist(AuctionStarted(Instant.now()))(_ => ctx.reply(Done))
         }
+    }.onCommand[UpdatePrice, Done] {
+      case (UpdatePrice(_), ctx, _) =>
+        ctx.invalidCommand("The auction must be started to update its price")
+        ctx.done
     }.onEvent {
       case (AuctionStarted(time), Some(item)) => Some(item.start(time))
     }.orElse(getItemCommand)

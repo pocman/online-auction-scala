@@ -2,13 +2,15 @@ package com.example.auction.item.impl
 
 import java.util.UUID
 
+import akka.{Done, NotUsed}
 import akka.persistence.query.Offset
 import com.datastax.driver.core.utils.UUIDs
-import com.example.auction.item.api.ItemService
+import com.example.auction.item.api.{ItemService, Price}
 import com.example.auction.item.api
 import com.example.auction.security.ServerSecurity._
 import com.lightbend.lagom.scaladsl.api.ServiceCall
-import com.lightbend.lagom.scaladsl.api.transport.{Forbidden, NotFound}
+import com.lightbend.lagom.scaladsl.api.broker.Topic
+import com.lightbend.lagom.scaladsl.api.transport.{BadRequest, Forbidden, NotFound}
 import com.lightbend.lagom.scaladsl.broker.TopicProducer
 import com.lightbend.lagom.scaladsl.persistence.{EventStreamElement, PersistentEntityRegistry}
 import com.lightbend.lagom.scaladsl.server.ServerServiceCall
@@ -31,7 +33,7 @@ class ItemServiceImpl(registry: PersistentEntityRegistry, itemRepository: ItemRe
     */
   private val DefaultFetchSize = 10
 
-  override def createItem = authenticated(userId => ServerServiceCall { item =>
+  override def createItem: ServerServiceCall[api.Item, api.Item] = authenticated(userId => ServerServiceCall { item =>
     if (userId != item.creator) {
       throw Forbidden("User " + userId + " can't created an item on behalf of " + item.creator)
     }
@@ -43,8 +45,17 @@ class ItemServiceImpl(registry: PersistentEntityRegistry, itemRepository: ItemRe
     }
   })
 
-  override def startAuction(id: UUID) = authenticated(userId => ServerServiceCall { _ =>
+  override def startAuction(id: UUID): ServerServiceCall[NotUsed, Done] = authenticated(userId => ServerServiceCall { _ =>
     entityRef(id).ask(StartAuction(userId))
+  })
+
+  override def updatePrice(id: UUID): ServiceCall[Price, Done] = authenticated(userId => ServerServiceCall { price =>
+    entityRef(id).ask(GetItem).flatMap {
+      case Some(item) if item.currencyId == price.currencyId && item.creator == userId => entityRef(id).ask(UpdatePrice(price.value))
+      case Some(item) if item.creator != userId => throw Forbidden("Only the creator can update the price of an item without bidding")
+      case Some(item) if item.currencyId != price.currencyId => throw BadRequest(s"Price must be in ${item.currencyId}")
+      case None => throw NotFound("Item " + id + " not found")
+    }
   })
 
   override def getItem(id: UUID) = ServerServiceCall { _ =>
@@ -58,7 +69,7 @@ class ItemServiceImpl(registry: PersistentEntityRegistry, itemRepository: ItemRe
     itemRepository.getItemsForUser(id, status, page, DefaultFetchSize)
   }
 
-  override def itemEvents = TopicProducer.taggedStreamWithOffset(ItemEvent.Tag.allTags.toList) { (tag, offset) =>
+  override def itemEvents: Topic[api.ItemEvent] = TopicProducer.taggedStreamWithOffset(ItemEvent.Tag.allTags.toList) { (tag, offset) =>
     registry.eventStream(tag, offset)
       .filter {
         _.event match {

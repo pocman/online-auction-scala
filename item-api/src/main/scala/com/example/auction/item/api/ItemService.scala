@@ -26,11 +26,19 @@ trait ItemService extends Service {
   def startAuction(id: UUID): ServiceCall[NotUsed, Done]
 
   /**
-    * Get an item with the given ID.
-    *
-    * @param id The ID of the item to get.
-    * @return The item.
-    */
+   * Update Price
+   *
+   * @param id The id of the item which price must be updated.
+   * @return Done if the price was updated.
+   */
+  def updatePrice(id: UUID): ServiceCall[Price, Done]
+
+  /**
+   * Get an item with the given ID.
+   *
+   * @param id The ID of the item to get.
+   * @return The item.
+   */
   def getItem(id: UUID): ServiceCall[NotUsed, Item]
 
   /**
@@ -54,6 +62,7 @@ trait ItemService extends Service {
     named("item").withCalls(
       pathCall("/api/item", createItem),
       restCall(Method.POST, "/api/item/:id/start", startAuction _),
+      restCall(Method.PUT, "/api/item/:id", updatePrice _),
       pathCall("/api/item/:id", getItem _),
       pathCall("/api/item?userId&status&page", getItemsForUser _)
     ).withTopics(

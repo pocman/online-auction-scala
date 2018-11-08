@@ -166,6 +166,42 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Update price",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "User-Id",
+						"value": "56356334-f5f0-4512-a90d-1ea6d59601ae",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"value\": 100000,\n\t\"currencyId\": \"EUR\"\n}"
+				},
+				"url": {
+					"raw": "localhost:10730/api/item/{{itemId}}",
+					"host": [
+						"localhost"
+					],
+					"port": "10730",
+					"path": [
+						"api",
+						"item",
+						"{{itemId}}"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
